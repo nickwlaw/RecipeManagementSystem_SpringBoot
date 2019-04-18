@@ -5,21 +5,21 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
-import com.rms.business.recipe.Recipe;
-import com.rms.business.recipe.RecipeRepository;
+import com.rms.business.recipe.RecipeLineItem;
+import com.rms.business.recipe.RecipeLineItemRepository;
 
 @RestController
-@RequestMapping("/recipes")
-public class RecipeController {
+@RequestMapping("/recipe-line-items")
+public class RecipeLineItemController {
 
 	@Autowired
-	private RecipeRepository recipeRepo;
+	private RecipeLineItemRepository rliRepo;
 	
 	@GetMapping("/")
 	public JsonResponse getAll() {
 		JsonResponse jr = null;
 		try {
-			jr = JsonResponse.getInstance(recipeRepo.findAll());
+			jr = JsonResponse.getInstance(rliRepo.findAll());
 		} catch (Exception e) {
 			jr = JsonResponse.getInstance(e);
 		}
@@ -30,7 +30,7 @@ public class RecipeController {
 	public JsonResponse getAllPaginated(@RequestParam int start, @RequestParam int limit) {
 		JsonResponse jr = null;
 		try {
-			jr = JsonResponse.getInstance(recipeRepo.findAll(PageRequest.of(start, limit)));
+			jr = JsonResponse.getInstance(rliRepo.findAll(PageRequest.of(start, limit)));
 		} catch (Exception e) {
 			jr = JsonResponse.getInstance(e);
 		}
@@ -41,10 +41,10 @@ public class RecipeController {
 	public JsonResponse get(@PathVariable int id) {
 		JsonResponse jr = null;
 		try {
-			if (recipeRepo.existsById(id))
-				jr = JsonResponse.getInstance(recipeRepo.findById(id).get());
+			if (rliRepo.existsById(id))
+				jr = JsonResponse.getInstance(rliRepo.findById(id));
 			else
-				jr = JsonResponse.getInstance("Recipe not found.");
+				jr = JsonResponse.getInstance("Recipe line item not found.");
 		} catch (Exception e) {
 			jr = JsonResponse.getInstance(e);
 		}
@@ -52,13 +52,13 @@ public class RecipeController {
 	}
 	
 	@PostMapping("/")
-	public JsonResponse add(@RequestBody Recipe r) {
+	public JsonResponse add(@RequestBody RecipeLineItem rli) {
 		JsonResponse jr = null;
 		try {
-			if (recipeRepo.existsById(r.getId()))
-				jr = JsonResponse.getInstance("Recipe already exists.");
+			if (rliRepo.existsById(rli.getId()))
+				jr = JsonResponse.getInstance("Recipe line item already exists.");
 			else
-				jr = JsonResponse.getInstance(saveRecipe(r));
+				jr = JsonResponse.getInstance(saveRLI(rli));
 		} catch (Exception e) {
 			jr = JsonResponse.getInstance(e);
 		}
@@ -66,13 +66,13 @@ public class RecipeController {
 	}
 	
 	@PutMapping("/")
-	public JsonResponse update(@RequestBody Recipe r) {
+	public JsonResponse update(@RequestBody RecipeLineItem rli) {
 		JsonResponse jr = null;
 		try {
-			if (recipeRepo.existsById(r.getId()))
-				jr = JsonResponse.getInstance(saveRecipe(r));
+			if (rliRepo.existsById(rli.getId()))
+				jr = JsonResponse.getInstance(saveRLI(rli));
 			else
-				jr = JsonResponse.getInstance("Recipe not found.");
+				jr = JsonResponse.getInstance("Recipe line item not found.");
 		} catch (Exception e) {
 			jr = JsonResponse.getInstance(e);
 		}
@@ -83,21 +83,21 @@ public class RecipeController {
 	public JsonResponse delete(@PathVariable int id) {
 		JsonResponse jr = null;
 		try {
-			if (recipeRepo.existsById(id)) {
-				jr = JsonResponse.getInstance(recipeRepo.findById(id));
-				recipeRepo.deleteById(id);
+			if (rliRepo.existsById(id)) {
+				jr = JsonResponse.getInstance(rliRepo.findById(id));
+				rliRepo.deleteById(id);
 			} else
-				jr = JsonResponse.getInstance("No recipe found with ID " + id);
+				jr = JsonResponse.getInstance("Recipe line item not found.");
 		} catch (Exception e) {
 			jr = JsonResponse.getInstance(e);
 		}
 		return jr;
 	}
 	
-	private JsonResponse saveRecipe(Recipe r) {
+	private JsonResponse saveRLI(RecipeLineItem rli) {
 		JsonResponse jr = null;
 		try {
-			jr = JsonResponse.getInstance(recipeRepo.save(r));
+			jr = JsonResponse.getInstance(rliRepo.save(rli));
 		} catch (DataIntegrityViolationException dive) {
 			jr = JsonResponse.getInstance(dive);
 		}
