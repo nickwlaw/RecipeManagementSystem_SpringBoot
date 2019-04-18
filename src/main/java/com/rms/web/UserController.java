@@ -116,7 +116,7 @@ public class UserController {
 			Optional<User> user = userRepo.findById(id);
 			if (user.isPresent()) {
 				userRepo.deleteById(id);
-				jr = JsonResponse.getInstance(user);
+				jr = JsonResponse.getInstance(user.get());
 			} else
 				jr = JsonResponse.getInstance("No user with ID " + id + " found.");
 		} catch (Exception e) {
